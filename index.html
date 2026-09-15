@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image" href="https://sicervantesto12.github.io/Portfolio/Untitled147_20260713010744.png">
 <link rel="stylesheet" href="styles.css">
+<!-- SheetJS: lets script.js read data.xlsx directly in the browser, no backend needed -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -35,76 +37,65 @@
   </div>
   <a href="https://reireis0033.github.io/reireiMain/" class="nav-lin" id="flyoutHome">Home</a>
   <a href="https://reireis0033.github.io/reireiportfolio/" class="nav-link active" id="flyoutAbout">Portfolio</a>
-  <a href="#" class="nav-link">Contacts</a>
+
+  <div class="flyout-contacts">
+    <p class="flyout-contacts-label">Contacts</p>
+
+    <div class="flyout-about">
+      <div class="flyout-avatar"><img src="https://sicervantesto12.github.io/Portfolio/pfp1.png" alt="pfp"></div>
+      <div class="flyout-about-text">
+        <p class="flyout-name">Rei-san</p>
+        <p class="flyout-role">Illustrator</p>
+      </div>
+    </div>
+    <p class="flyout-bio">Coffee Addict with caution<br>NO CREAMER JUST STRAIGHT BLACK.</p>
+
+    <div class="flyout-contact-list">
+      <a class="flyout-contact" href="mailto:reireisenpai@gmail.com">Gmail | reireisenpai@Gmail.com</a>
+      <a class="flyout-contact" href="https://discord.com/users/506481200408559627" target="_blank" rel="noopener">Discord | rei-san</a>
+      <a class="flyout-contact" href="https://facebook.com/reirei0033" target="_blank" rel="noopener">Facebook | Rei san</a>
+      <a class="flyout-contact" href="https://www.tiktok.com/@reirei0033?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener">Tiktok | @reirei0033</a>
+      <a class="flyout-contact" href="https://vgen.co/rei_mii1" target="_blank" rel="noopener">Vgen | @rei_mii1</a>
+      <a class="flyout-contact" href="https://x.com/rei_mii1" target="_blank" rel="noopener">X | @rei_mii1</a>
+      <a class="flyout-contact" href="https://youtube.com/@reireich.2937?si=vf7grNopCxH4b3HE" target="_blank" rel="noopener">Youtube | reirei ch.</a>
+    </div>
+  </div>
 </div>
 
 <header>
   <div class="header-inner">
     <div class="row-top">
-      <div class="row-spacer" aria-hidden="true"></div>
       <div class="logo"><img class="dot" src="https://sicervantesto12.github.io/Portfolio/Untitled147_20260713010717.png" alt="logo">Portfolio</div>
-
-      <button class="about-toggle" id="aboutToggle" aria-haspopup="dialog" aria-expanded="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.8" r="0.9" fill="currentColor" stroke="none"/></svg>
-        About
-      </button>
     </div>
-
-    <nav class="pills" aria-label="Filter by category" id="pills"></nav>
   </div>
 </header>
 
-<main>
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="emptyState" style="display:none;">
-    <div class="glyph">”</div>
-    <h2>Nothing here yet</h2>
-    <p id="emptyText">No images in this category yet. Try a different filter, or refresh the website it to see everything again.</p>
-    <button id="resetBtn">Back to Home</button>
-  </div>
-</main>
+<div class="layout">
+  <aside class="filter-panel" aria-label="Filter by category">
+    <p class="filter-panel-title">Filter</p>
+    <div class="filter-list" id="filterList"></div>
+  </aside>
 
-<div class="about-overlay" id="aboutOverlay">
-  <div class="about-modal" role="dialog" aria-modal="true" aria-labelledby="aboutName">
-    <button class="about-close" id="aboutClose" aria-label="Close">✕</button>
-    <div class="about-avatar"><img src="https://sicervantesto12.github.io/Portfolio/pfp1.png" alt="pfp"></div>
-    <h2 id="aboutName">Rei-san</h2>
-    <p class="about-role">Illustrator</p>
-    <p class="about-bio">Coffee Addict with caution<br>NO CREAMER JUST STRAIGHT BLACK.</p>
-    <div class="about-contacts">
-      <a class="about-contact" href="mailto:reireisenpai@gmail.com">
-        Gmail| reireisenpai@Gmail.com
-      </a>
-      <a class="about-contact" href="https://discord.com/users/506481200408559627" target="_blank" rel="noopener">
-        Discord| rei-san
-      </a>
-      <a class="about-contact" href="https://facebook.com/reirei0033" target="_blank" rel="noopener">
-        Facebook| Rei san
-      </a>
-       <a class="about-contact" href="https://www.tiktok.com/@reirei0033?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener">
-        Tiktok| @reirei0033
-      </a>
-       <a class="about-contact" href="https://vgen.co/rei_mii1" target="_blank" rel="noopener">
-        Vgen| @rei_mii1
-      </a>
-       <a class="about-contact" href="https://x.com/rei_mii1" target="_blank" rel="noopener">
-        X| @rei_mii1
-      </a>
-       <a class="about-contact" href="https://youtube.com/@reireich.2937?si=vf7grNopCxH4b3HE" target="_blank" rel="noopener">
-        Youtube| reirei ch.
-      </a>
-
+  <main>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="emptyState" style="display:none;">
+      <div class="glyph">”</div>
+      <h2>Nothing here yet</h2>
+      <p id="emptyText">No images in this category yet. Try a different filter, or refresh the website it to see everything again.</p>
+      <button id="resetBtn">Back to Home</button>
     </div>
-  </div>
+  </main>
 </div>
 
 <div class="lightbox-overlay" id="lightboxOverlay">
-  <button class="lightbox-close" id="lightboxClose" aria-label="Close">✕</button>
-  <div class="lightbox-content">
-    <img id="lightboxImg" src="" alt="">
-    <div class="lightbox-caption">
-      <p id="lightboxTitle"></p>
-      <span id="lightboxTag"></span>
+  <div class="lightbox-modal" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Close">✕</button>
+    <div class="lightbox-content">
+      <img id="lightboxImg" src="" alt="">
+      <div class="lightbox-caption">
+        <p id="lightboxTitle"></p>
+        <span id="lightboxTag"></span>
+      </div>
     </div>
   </div>
 </div>
