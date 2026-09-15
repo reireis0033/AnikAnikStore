@@ -6,6 +6,7 @@
 
   const grid = document.getElementById('grid');
   const filterList = document.getElementById('filterList');
+  const tagNav = document.getElementById('tagNav');
   const emptyState = document.getElementById('emptyState');
   const resetBtn = document.getElementById('resetBtn');
   const lightboxOverlay = document.getElementById('lightboxOverlay');
@@ -15,6 +16,7 @@
   const lightboxClose = document.getElementById('lightboxClose');
 
   let selectedCats = new Set(); // empty set == "All"
+  let selectedTag = null; // null == "All" in the top tag nav
   let items = [];
   let loadToken = 0; // bumped every render so stale sequential loads stop themselves
 
@@ -71,7 +73,52 @@
   categories.forEach(cat => filterList.appendChild(buildCatCheckbox(cat)));
 
   function matches(item) {
-    return selectedCats.size === 0 || selectedCats.has(item.cat);
+    const catOk = selectedCats.size === 0 || selectedCats.has(item.cat);
+    const tagOk = !selectedTag || (item.tags || []).includes(selectedTag);
+    return catOk && tagOk;
+  }
+
+  // ---------------------------------------------------------------
+  // Top nav: tag pills, built once the data (and its tags) are known
+  // ---------------------------------------------------------------
+  function buildTagNav() {
+    const allTags = new Set();
+    items.forEach(item => (item.tags || []).forEach(t => t && allTags.add(t)));
+
+    tagNav.innerHTML = "";
+
+    const allPill = document.createElement('button');
+    allPill.type = 'button';
+    allPill.className = 'tag-pill active';
+    allPill.textContent = 'All';
+    allPill.addEventListener('click', () => {
+      selectedTag = null;
+      syncTagNav();
+      render();
+    });
+    tagNav.appendChild(allPill);
+
+    Array.from(allTags).sort().forEach(tag => {
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'tag-pill';
+      pill.textContent = tag;
+      pill.dataset.tag = tag;
+      pill.addEventListener('click', () => {
+        selectedTag = (selectedTag === tag) ? null : tag;
+        syncTagNav();
+        render();
+      });
+      tagNav.appendChild(pill);
+    });
+  }
+
+  function syncTagNav() {
+    const pills = tagNav.querySelectorAll('.tag-pill');
+    pills.forEach(pill => {
+      const isAll = !pill.dataset.tag;
+      pill.classList.toggle('active', isAll ? !selectedTag : pill.dataset.tag === selectedTag);
+    });
   }
 
   // ---------------------------------------------------------------
@@ -186,7 +233,9 @@
 
   resetBtn.addEventListener('click', () => {
     selectedCats.clear();
+    selectedTag = null;
     syncCheckboxes();
+    syncTagNav();
     render();
   });
 
@@ -226,6 +275,30 @@
   });
 
   // ---------------------------------------------------------------
+  // Contacts popup, opened from the "Contacts" item in the burger menu
+  // ---------------------------------------------------------------
+  const flyoutContactsBtn = document.getElementById('flyoutContactsBtn');
+  const contactsOverlay = document.getElementById('contactsOverlay');
+  const contactsClose = document.getElementById('contactsClose');
+
+  function openContacts() {
+    closeFlyout();
+    contactsOverlay.classList.add('open');
+    contactsClose.focus();
+  }
+  function closeContacts() {
+    contactsOverlay.classList.remove('open');
+  }
+  flyoutContactsBtn.addEventListener('click', openContacts);
+  contactsClose.addEventListener('click', closeContacts);
+  contactsOverlay.addEventListener('click', (e) => {
+    if (e.target === contactsOverlay) closeContacts();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && contactsOverlay.classList.contains('open')) closeContacts();
+  });
+
+  // ---------------------------------------------------------------
   // Load image data: try data.xlsx first (via SheetJS), fall back to data.json
   // ---------------------------------------------------------------
   function normalize(rawItems) {
@@ -237,6 +310,7 @@
       date: item.date || null,
       src: BASE_URL + item.file,
     }));
+    buildTagNav();
     render();
   }
 

@@ -35,16 +35,20 @@
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
   </div>
-  <a href="https://reireis0033.github.io/reireiMain/" class="nav-lin" id="flyoutHome">Home</a>
+  <a href="https://reireis0033.github.io/reireiMain/" class="nav-link" id="flyoutHome">Home</a>
   <a href="https://reireis0033.github.io/reireiportfolio/" class="nav-link active" id="flyoutAbout">Portfolio</a>
+  <button type="button" class="nav-link nav-link-btn" id="flyoutContactsBtn" aria-haspopup="dialog" aria-controls="contactsOverlay">Contacts</button>
+</div>
 
-  <div class="flyout-contacts">
-    <p class="flyout-contacts-label">Contacts</p>
+<!-- Contacts popup, opened from the "Contacts" item in the burger menu -->
+<div class="contacts-overlay" id="contactsOverlay">
+  <div class="contacts-modal" role="dialog" aria-modal="true" aria-labelledby="contactsName">
+    <button class="contacts-close" id="contactsClose" aria-label="Close">✕</button>
 
     <div class="flyout-about">
       <div class="flyout-avatar"><img src="https://sicervantesto12.github.io/Portfolio/pfp1.png" alt="pfp"></div>
       <div class="flyout-about-text">
-        <p class="flyout-name">Rei-san</p>
+        <p class="flyout-name" id="contactsName">Rei-san</p>
         <p class="flyout-role">Illustrator</p>
       </div>
     </div>
@@ -69,6 +73,8 @@
     </div>
   </div>
 </header>
+
+<nav class="tag-nav" id="tagNav" aria-label="Filter by tag"></nav>
 
 <div class="layout">
   <aside class="filter-panel" aria-label="Filter by category">
