@@ -1,12 +1,11 @@
 (function () {
-  const categories = ["Illustration", "Character Design","Animation","Stickers","Emotes","Chibi","Icon","Bust-up","Half-Body","Knee-up","Full Body","Sketch","NSFW"];
-  const BASE_URL = "https://sicervantesto12.github.io/IMAGESforportfolio/";
+  const categories = ["Genshin Impact", "Honkai Star Rail","Honkai Impact","Wuthering Waves","Zenless Zone Zero","Anime","Game","Chix","Betlog","NSFW"];
+  const BASE_URL = "https://reireis0033.github.io/DatabasengANIKANIK/";
   const XLSX_URL = "data.xlsx"; // preferred — edit this with any spreadsheet app
   const JSON_URL = "data.json"; // used automatically if data.xlsx can't be read
 
   const grid = document.getElementById('grid');
   const filterList = document.getElementById('filterList');
-  const tagNav = document.getElementById('tagNav');
   const emptyState = document.getElementById('emptyState');
   const resetBtn = document.getElementById('resetBtn');
   const lightboxOverlay = document.getElementById('lightboxOverlay');
@@ -16,7 +15,7 @@
   const lightboxClose = document.getElementById('lightboxClose');
 
   let selectedCats = new Set(); // empty set == "All"
-  let selectedTag = null; // null == "All" in the top tag nav
+  let sortOrder = 'asc'; // 'asc' (low to high) or 'desc' (high to low), by item id
   let items = [];
   let loadToken = 0; // bumped every render so stale sequential loads stop themselves
 
@@ -72,53 +71,21 @@
   filterList.appendChild(buildAllCheckbox());
   categories.forEach(cat => filterList.appendChild(buildCatCheckbox(cat)));
 
-  function matches(item) {
-    const catOk = selectedCats.size === 0 || selectedCats.has(item.cat);
-    const tagOk = !selectedTag || (item.tags || []).includes(selectedTag);
-    return catOk && tagOk;
-  }
-
   // ---------------------------------------------------------------
-  // Top nav: tag pills, built once the data (and its tags) are known
+  // Sort control: Low to High / High to Low (by item order)
   // ---------------------------------------------------------------
-  function buildTagNav() {
-    const allTags = new Set();
-    items.forEach(item => (item.tags || []).forEach(t => t && allTags.add(t)));
-
-    tagNav.innerHTML = "";
-
-    const allPill = document.createElement('button');
-    allPill.type = 'button';
-    allPill.className = 'tag-pill active';
-    allPill.textContent = 'All';
-    allPill.addEventListener('click', () => {
-      selectedTag = null;
-      syncTagNav();
-      render();
-    });
-    tagNav.appendChild(allPill);
-
-    Array.from(allTags).sort().forEach(tag => {
-      const pill = document.createElement('button');
-      pill.type = 'button';
-      pill.className = 'tag-pill';
-      pill.textContent = tag;
-      pill.dataset.tag = tag;
-      pill.addEventListener('click', () => {
-        selectedTag = (selectedTag === tag) ? null : tag;
-        syncTagNav();
+  const sortList = document.getElementById('sortList');
+  sortList.querySelectorAll('input[name="sortOrder"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) {
+        sortOrder = radio.value;
         render();
-      });
-      tagNav.appendChild(pill);
+      }
     });
-  }
+  });
 
-  function syncTagNav() {
-    const pills = tagNav.querySelectorAll('.tag-pill');
-    pills.forEach(pill => {
-      const isAll = !pill.dataset.tag;
-      pill.classList.toggle('active', isAll ? !selectedTag : pill.dataset.tag === selectedTag);
-    });
+  function matches(item) {
+    return selectedCats.size === 0 || selectedCats.has(item.cat);
   }
 
   // ---------------------------------------------------------------
@@ -126,6 +93,7 @@
   // ---------------------------------------------------------------
   function render() {
     const list = items.filter(matches);
+    list.sort((a, b) => sortOrder === 'desc' ? b.id - a.id : a.id - b.id);
     const myToken = ++loadToken; // invalidates any loader still working from a previous render
 
     grid.innerHTML = "";
@@ -233,9 +201,7 @@
 
   resetBtn.addEventListener('click', () => {
     selectedCats.clear();
-    selectedTag = null;
     syncCheckboxes();
-    syncTagNav();
     render();
   });
 
@@ -310,7 +276,6 @@
       date: item.date || null,
       src: BASE_URL + item.file,
     }));
-    buildTagNav();
     render();
   }
 

@@ -75,47 +75,6 @@ header{
   transform: translateY(-1px);
 }
 
-/* ---------- Top tag nav ---------- */
-.tag-nav{
-  background:var(--cream);
-  border-bottom:2px solid var(--ink);
-  padding:12px 28px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  overflow-x:auto;
-  scrollbar-width:none;
-}
-.tag-nav::-webkit-scrollbar{ display:none; }
-.tag-pill{
-  flex-shrink:0;
-  border:2px solid var(--ink);
-  background:var(--white);
-  color:var(--ink);
-  padding:6px 14px;
-  border-radius:999px;
-  font-family:'Space Mono', monospace;
-  font-weight:700;
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.06em;
-  cursor:pointer;
-  white-space:nowrap;
-  transition:transform .15s ease, background .15s ease, color .15s ease, box-shadow .15s ease;
-  box-shadow:3px 3px 0 var(--ink);
-}
-.tag-pill:hover{ transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--ink); }
-.tag-pill:active{ transform:translate(0,0); box-shadow:1px 1px 0 var(--ink); }
-.tag-pill.active{
-  background:var(--pink);
-  color:var(--white);
-  border-color:var(--ink);
-}
-@media (max-width:460px){
-  .tag-nav{ padding:10px 16px; gap:6px; }
-  .tag-pill{ padding:5px 12px; font-size:10px; }
-}
-
 /* ---------- Chrome-flyout Contacts section (About content lives here now) ---------- */
 .flyout-contacts{
   margin-top:18px;
@@ -247,6 +206,31 @@ header{
   transform:rotate(40deg);
 }
 .filter-row span{ line-height:1.3; }
+
+.filter-panel-title-spaced{ margin-top:16px; padding-top:12px; border-top:1px solid var(--cream-2); }
+
+.filter-row input[type="radio"]{
+  appearance:none;
+  -webkit-appearance:none;
+  width:16px; height:16px; flex-shrink:0;
+  border:2px solid var(--ink);
+  border-radius:50%;
+  background:var(--white);
+  cursor:pointer;
+  position:relative;
+  transition:background .15s ease, border-color .15s ease;
+}
+.filter-row input[type="radio"]:checked{
+  border-color:var(--ink);
+}
+.filter-row input[type="radio"]:checked::after{
+  content:"";
+  position:absolute;
+  left:2px; top:2px;
+  width:8px; height:8px;
+  border-radius:50%;
+  background:var(--pink);
+}
 
 main{ min-width:0; }
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reference — a calmer way to collect visual ideas</title>
+<title>StoreNiReirei - Only in BVLCN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image" href="https://sicervantesto12.github.io/Portfolio/Untitled147_20260713010744.png">
@@ -35,8 +35,8 @@
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
   </div>
-  <a href="https://reireis0033.github.io/reireiMain/" class="nav-link" id="flyoutHome">Home</a>
-  <a href="https://reireis0033.github.io/reireiportfolio/" class="nav-link active" id="flyoutAbout">Portfolio</a>
+  <a href="Hanime.tv" class="nav-link" id="flyoutHome">Home</a>
+  <a href="https://reireis0033.github.io/reireiportfolio/" class="nav-link active" id="flyoutAbout">Stash</a>
   <button type="button" class="nav-link nav-link-btn" id="flyoutContactsBtn" aria-haspopup="dialog" aria-controls="contactsOverlay">Contacts</button>
 </div>
 
@@ -48,20 +48,17 @@
     <div class="flyout-about">
       <div class="flyout-avatar"><img src="https://sicervantesto12.github.io/Portfolio/pfp1.png" alt="pfp"></div>
       <div class="flyout-about-text">
-        <p class="flyout-name" id="contactsName">Rei-san</p>
+        <p class="flyout-name" id="contactsName">Reirei</p>
         <p class="flyout-role">Illustrator</p>
       </div>
     </div>
-    <p class="flyout-bio">Coffee Addict with caution<br>NO CREAMER JUST STRAIGHT BLACK.</p>
+    <p class="flyout-bio">Coffee Addict with caution<br>NO CREAMER JUST STRAIGHT BLACK.<br><br>Mode of Delivery: FLASH | LBC | LALAMOVE<br><br>Mode of Payment: GCASH<br><br>Contact me on:</p>
 
     <div class="flyout-contact-list">
       <a class="flyout-contact" href="mailto:reireisenpai@gmail.com">Gmail | reireisenpai@Gmail.com</a>
       <a class="flyout-contact" href="https://discord.com/users/506481200408559627" target="_blank" rel="noopener">Discord | rei-san</a>
-      <a class="flyout-contact" href="https://facebook.com/reirei0033" target="_blank" rel="noopener">Facebook | Rei san</a>
       <a class="flyout-contact" href="https://www.tiktok.com/@reirei0033?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener">Tiktok | @reirei0033</a>
       <a class="flyout-contact" href="https://vgen.co/rei_mii1" target="_blank" rel="noopener">Vgen | @rei_mii1</a>
-      <a class="flyout-contact" href="https://x.com/rei_mii1" target="_blank" rel="noopener">X | @rei_mii1</a>
-      <a class="flyout-contact" href="https://youtube.com/@reireich.2937?si=vf7grNopCxH4b3HE" target="_blank" rel="noopener">Youtube | reirei ch.</a>
     </div>
   </div>
 </div>
@@ -69,16 +66,25 @@
 <header>
   <div class="header-inner">
     <div class="row-top">
-      <div class="logo"><img class="dot" src="https://sicervantesto12.github.io/Portfolio/Untitled147_20260713010717.png" alt="logo">Portfolio</div>
+      <div class="logo">STASH</div>
     </div>
   </div>
 </header>
 
-<nav class="tag-nav" id="tagNav" aria-label="Filter by tag"></nav>
-
 <div class="layout">
   <aside class="filter-panel" aria-label="Filter by category">
-    <p class="filter-panel-title">Filter</p>
+    <p class="filter-panel-title">Sort</p>
+    <div class="filter-list" id="sortList">
+      <label class="filter-row">
+        <input type="radio" name="sortOrder" value="asc" checked>
+        <span>Low to High</span>
+      </label>
+      <label class="filter-row">
+        <input type="radio" name="sortOrder" value="desc">
+        <span>High to Low</span>
+      </label>
+    </div>
+    <p class="filter-panel-title filter-panel-title-spaced">Filter</p>
     <div class="filter-list" id="filterList"></div>
   </aside>
 
@@ -106,7 +112,7 @@
   </div>
 </div>
 
-<footer>Reference — a quieter place to collect what you notice.</footer>
+<footer> a quieter place to collect what you notice.</footer>
 
 <script src="script.js"></script>
 
