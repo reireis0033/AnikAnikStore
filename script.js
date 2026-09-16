@@ -11,7 +11,8 @@
   const lightboxOverlay = document.getElementById('lightboxOverlay');
   const lightboxImg = document.getElementById('lightboxImg');
   const lightboxTitle = document.getElementById('lightboxTitle');
-  const lightboxTag = document.getElementById('lightboxTag');
+  const lightboxPrice = document.getElementById('lightboxPrice');
+  const lightboxDescription = document.getElementById('lightboxDescription');
   const lightboxClose = document.getElementById('lightboxClose');
 
   let selectedCats = new Set(); // empty set == "All"
@@ -183,7 +184,8 @@
     lightboxImg.src = item.src;
     lightboxImg.alt = item.title;
     lightboxTitle.textContent = item.title;
-    lightboxTag.textContent = item.cat;
+    lightboxPrice.textContent = item.price ? `₱${item.price}` : 'Price not set';
+    lightboxDescription.textContent = item.description || 'No description yet.';
     lightboxOverlay.classList.add('open');
     lightboxClose.focus();
   }
@@ -272,6 +274,8 @@
       id: index + 1,
       title: item.title || "Untitled",
       cat: item.cat || "Illustration",
+      price: item.price || "",
+      description: item.description || "",
       tags: item.tags || [],
       date: item.date || null,
       src: BASE_URL + item.file,
@@ -294,6 +298,8 @@
           file: String(row.file || row.File || "").trim(),
           title: String(row.title || row.Title || "").trim(),
           cat: String(row.cat || row.Category || row.category || "").trim(),
+          price: String(row.price || row.Price || "").trim(),
+          description: String(row.description || row.Description || "").trim(),
           tags: String(row.tags || row.Tags || "")
             .split(",")
             .map(t => t.trim())

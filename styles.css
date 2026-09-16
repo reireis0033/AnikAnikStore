@@ -405,18 +405,26 @@ main{ min-width:0; }
   text-transform:uppercase;
   margin:0 0 8px;
 }
-.lightbox-caption span{
+.lightbox-price{
   display:inline-block;
-  font-size:10px;
+  font-size:11px;
   font-family:'Space Mono', monospace;
   font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.06em;
+  letter-spacing:.04em;
   background:var(--pink);
   color:var(--white);
-  padding:3px 10px;
+  padding:4px 11px;
   border-radius:999px;
   transform:rotate(-1.5deg);
+}
+
+#lightboxDescription{
+  max-width:620px;
+  margin:12px auto 0;
+  font-family:'Space Mono', monospace;
+  font-size:12px;
+  line-height:1.6;
+  color:rgba(22,18,16,0.72);
 }
 .lightbox-close{
   position:absolute; top:14px; right:14px;
