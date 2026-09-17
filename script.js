@@ -7,7 +7,7 @@
     "https://reireis0033.github.io/DatabasengANIKANIK/";
 
   // Your store data
-  const JSON_URL = "./data.json";
+  const JSON_URL = "https://reireis0033.github.io/anikanik-admin/data.json";
 
   const grid = document.getElementById("grid");
   const filterList = document.getElementById("filterList");
