@@ -7,7 +7,7 @@
     "Game", "Chix", "Betlog", "NSFW"
   ];
 
-  const BASE_URL = "";
+  const BASE_URL = "https://reireis0033.github.io/DatabasengANIKANIK/";
   const JSON_URL = "data.json";
 
   const grid = document.getElementById("grid");
