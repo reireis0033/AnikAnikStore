@@ -8,12 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image" href="https://sicervantesto12.github.io/Portfolio/Untitled147_20260713010744.png">
 <link rel="stylesheet" href="styles.css">
-<!-- SheetJS: lets script.js read data.xlsx directly in the browser, no backend needed -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
-<!-- Browser-style chrome bar: functional hamburger + refresh -->
 <div class="chrome">
   <button class="chrome-btn" id="hamburgerChrome" aria-label="Open menu" aria-expanded="false">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4H14M2 8H14M2 12H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -27,7 +24,6 @@
   </button>
 </div>
 
-<!-- Floating flyout menu opened by the chrome-bar hamburger: solid black full-height column, left-aligned -->
 <div class="chrome-flyout" id="chromeFlyout">
   <div class="chrome-flyout-header">
     <div class="chrome-flyout-brand"><span class="ear"></span>MENU</div>
@@ -40,11 +36,9 @@
   <button type="button" class="nav-link nav-link-btn" id="flyoutContactsBtn" aria-haspopup="dialog" aria-controls="contactsOverlay">Contacts</button>
 </div>
 
-<!-- Contacts popup, opened from the "Contacts" item in the burger menu -->
 <div class="contacts-overlay" id="contactsOverlay">
   <div class="contacts-modal" role="dialog" aria-modal="true" aria-labelledby="contactsName">
     <button class="contacts-close" id="contactsClose" aria-label="Close">✕</button>
-
     <div class="flyout-about">
       <div class="flyout-avatar"><img src="https://sicervantesto12.github.io/Portfolio/pfp1.png" alt="pfp"></div>
       <div class="flyout-about-text">
@@ -53,7 +47,6 @@
       </div>
     </div>
     <p class="flyout-bio">Coffee Addict with caution<br>NO CREAMER JUST STRAIGHT BLACK.<br><br>Mode of Delivery: FLASH | LBC | LALAMOVE<br><br>Mode of Payment: GCASH<br><br>Contact me on:</p>
-
     <div class="flyout-contact-list">
       <a class="flyout-contact" href="mailto:reireisenpai@gmail.com">Gmail | reireisenpai@Gmail.com</a>
       <a class="flyout-contact" href="https://discord.com/users/506481200408559627" target="_blank" rel="noopener">Discord | rei-san</a>
@@ -84,6 +77,7 @@
         <span>High to Low</span>
       </label>
     </div>
+
     <p class="filter-panel-title filter-panel-title-spaced">Filter</p>
     <div class="filter-list" id="filterList"></div>
   </aside>
@@ -114,8 +108,6 @@
 </div>
 
 <footer> a quieter place to collect what you notice.</footer>
-
 <script src="script.js"></script>
-
 </body>
 </html>
