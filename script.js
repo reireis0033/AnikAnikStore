@@ -11,6 +11,7 @@
 
   const grid = document.getElementById("grid");
   const filterList = document.getElementById("filterList");
+  const tagFilterList = document.getElementById("tagFilterList");
   const sortList = document.getElementById("sortList");
   const emptyState = document.getElementById("emptyState");
   const emptyText = document.getElementById("emptyText");
@@ -25,6 +26,7 @@
 
   let items = [];
   let selectedCats = new Set();
+  let selectedTags = new Set();
   let sortOrder = "asc";
 
   // --------------------------------------------------
@@ -126,14 +128,106 @@
   }
 
   // --------------------------------------------------
+  // TAG FILTERS
+  // --------------------------------------------------
+
+  function buildTagFilters() {
+    tagFilterList.innerHTML = "";
+
+    // All
+    const allRow = document.createElement("label");
+    allRow.className = "filter-row filter-row-all";
+
+    const allCheckbox = document.createElement("input");
+    allCheckbox.type = "checkbox";
+    allCheckbox.checked = true;
+
+    const allText = document.createElement("span");
+    allText.textContent = "All";
+
+    allRow.appendChild(allCheckbox);
+    allRow.appendChild(allText);
+    tagFilterList.appendChild(allRow);
+
+    allCheckbox.addEventListener("change", function () {
+      if (this.checked) {
+        selectedTags.clear();
+        syncTagFilters();
+        render();
+      } else {
+        this.checked = true;
+      }
+    });
+
+    // Get tags DIRECTLY from JSON
+    const tags = [
+      ...new Set(
+        items
+          .flatMap(item => item.tags)
+          .filter(Boolean)
+      )
+    ];
+
+    tags.forEach(tag => {
+      const row = document.createElement("label");
+      row.className = "filter-row";
+      row.dataset.tag = tag;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+
+      const text = document.createElement("span");
+      text.textContent = tag;
+
+      row.appendChild(checkbox);
+      row.appendChild(text);
+      tagFilterList.appendChild(row);
+
+      checkbox.addEventListener("change", function () {
+        if (this.checked) {
+          selectedTags.add(tag);
+        } else {
+          selectedTags.delete(tag);
+        }
+
+        syncTagFilters();
+        render();
+      });
+    });
+  }
+
+  function syncTagFilters() {
+    const allCheckbox =
+      tagFilterList.querySelector('[data-role="all"] input') ||
+      tagFilterList.querySelector(".filter-row-all input");
+
+    if (allCheckbox) {
+      allCheckbox.checked = selectedTags.size === 0;
+    }
+
+    tagFilterList.querySelectorAll("[data-tag]").forEach(row => {
+      const tag = row.dataset.tag;
+      const checkbox = row.querySelector("input");
+
+      checkbox.checked = selectedTags.has(tag);
+    });
+  }
+
+  // --------------------------------------------------
   // FILTER MATCHING
   // --------------------------------------------------
 
   function matches(item) {
-    return (
+    const catOk =
       selectedCats.size === 0 ||
-      selectedCats.has(item.cat)
-    );
+      selectedCats.has(item.cat);
+
+    const tagsOk =
+      selectedTags.size === 0 ||
+      (Array.isArray(item.tags) &&
+        item.tags.some(tag => selectedTags.has(tag)));
+
+    return catOk && tagsOk;
   }
 
   // --------------------------------------------------
@@ -333,6 +427,7 @@
     "click",
     function () {
       selectedCats.clear();
+      selectedTags.clear();
 
       sortOrder = "asc";
 
@@ -346,6 +441,7 @@
       }
 
       syncFilters();
+      syncTagFilters();
       render();
     }
   );
@@ -545,6 +641,9 @@
 
       // Build categories from JSON
       buildFilters();
+
+      // Build tags from JSON
+      buildTagFilters();
 
       // Display everything
       render();
