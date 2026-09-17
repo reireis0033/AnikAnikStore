@@ -1,4 +1,4 @@
-```js
+
 (function () {
   "use strict";
 
@@ -572,4 +572,4 @@
   loadData();
 
 })();
-```
+
