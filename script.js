@@ -1,14 +1,13 @@
+```js
 (function () {
   "use strict";
 
-  const categories = [
-    "Genshin Impact", "Honkai Star Rail", "Honkai Impact",
-    "Wuthering Waves", "Zenless Zone Zero", "Anime",
-    "Game", "Chix", "Betlog", "NSFW"
-  ];
+  // Your image database
+  const BASE_URL =
+    "https://reireis0033.github.io/DatabasengANIKANIK/";
 
-  const BASE_URL = "https://reireis0033.github.io/DatabasengANIKANIK/";
-  const JSON_URL = "data.json";
+  // Your store data
+  const JSON_URL = "./data.json";
 
   const grid = document.getElementById("grid");
   const filterList = document.getElementById("filterList");
@@ -24,122 +23,187 @@
   const lightboxDescription = document.getElementById("lightboxDescription");
   const lightboxClose = document.getElementById("lightboxClose");
 
+  let items = [];
   let selectedCats = new Set();
   let sortOrder = "asc";
-  let items = [];
-  let loadToken = 0;
 
-  function buildAllCheckbox() {
-    const row = document.createElement("label");
-    row.className = "filter-row filter-row-all";
-    row.innerHTML = '<input type="checkbox" checked><span>All</span>';
-
-    const box = row.querySelector("input");
-    box.addEventListener("change", () => {
-      if (box.checked) {
-        selectedCats.clear();
-        syncCheckboxes();
-        render();
-      } else {
-        box.checked = true;
-      }
-    });
-
-    row.dataset.role = "all";
-    return row;
-  }
-
-  function buildCatCheckbox(cat) {
-    const row = document.createElement("label");
-    row.className = "filter-row";
-
-    const box = document.createElement("input");
-    box.type = "checkbox";
-
-    const label = document.createElement("span");
-    label.textContent = cat;
-
-    row.append(box, label);
-    row.dataset.cat = cat;
-
-    box.addEventListener("change", () => {
-      if (box.checked) {
-        selectedCats.add(cat);
-      } else {
-        selectedCats.delete(cat);
-      }
-      syncCheckboxes();
-      render();
-    });
-
-    return row;
-  }
-
-  function buildFilters() {
-    filterList.replaceChildren(buildAllCheckbox());
-    categories.forEach(cat => filterList.appendChild(buildCatCheckbox(cat)));
-  }
-
-  function syncCheckboxes() {
-    const allBox = filterList.querySelector('[data-role="all"] input');
-    if (allBox) allBox.checked = selectedCats.size === 0;
-
-    categories.forEach(cat => {
-      const row = Array.from(filterList.querySelectorAll("[data-cat]"))
-        .find(el => el.dataset.cat === cat);
-      if (row) {
-        row.querySelector("input").checked = selectedCats.has(cat);
-      }
-    });
-  }
+  // --------------------------------------------------
+  // PRICE
+  // --------------------------------------------------
 
   function getPrice(item) {
-    const value = Number.parseFloat(String(item.price ?? "").replace(/[^\d.-]/g, ""));
-    return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+    const value = parseFloat(
+      String(item.price || "").replace(/[^\d.-]/g, "")
+    );
+
+    return Number.isFinite(value) ? value : Infinity;
   }
 
-  function matches(item) {
-    return selectedCats.size === 0 || selectedCats.has(item.cat);
-  }
+  // --------------------------------------------------
+  // FILTERS
+  // --------------------------------------------------
 
-  function render() {
-    const list = items.filter(matches);
+  function buildFilters() {
+    filterList.innerHTML = "";
 
-    list.sort((a, b) => {
-      const priceDifference = getPrice(a) - getPrice(b);
+    // All
+    const allRow = document.createElement("label");
+    allRow.className = "filter-row filter-row-all";
 
-      if (Number.isFinite(priceDifference) && priceDifference !== 0) {
-        return sortOrder === "desc" ? -priceDifference : priceDifference;
+    const allCheckbox = document.createElement("input");
+    allCheckbox.type = "checkbox";
+    allCheckbox.checked = true;
+
+    const allText = document.createElement("span");
+    allText.textContent = "All";
+
+    allRow.appendChild(allCheckbox);
+    allRow.appendChild(allText);
+    filterList.appendChild(allRow);
+
+    allCheckbox.addEventListener("change", function () {
+      if (this.checked) {
+        selectedCats.clear();
+        syncFilters();
+        render();
+      } else {
+        this.checked = true;
       }
-
-      return sortOrder === "desc" ? b.id - a.id : a.id - b.id;
     });
 
-    const myToken = ++loadToken;
-    grid.replaceChildren();
+    // Get categories DIRECTLY from JSON
+    const categories = [
+      ...new Set(
+        items
+          .map(item => item.cat)
+          .filter(Boolean)
+      )
+    ];
+
+    categories.forEach(category => {
+      const row = document.createElement("label");
+      row.className = "filter-row";
+      row.dataset.cat = category;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+
+      const text = document.createElement("span");
+      text.textContent = category;
+
+      row.appendChild(checkbox);
+      row.appendChild(text);
+      filterList.appendChild(row);
+
+      checkbox.addEventListener("change", function () {
+        if (this.checked) {
+          selectedCats.add(category);
+        } else {
+          selectedCats.delete(category);
+        }
+
+        syncFilters();
+        render();
+      });
+    });
+  }
+
+  function syncFilters() {
+    const allCheckbox =
+      filterList.querySelector('[data-role="all"] input') ||
+      filterList.querySelector(".filter-row-all input");
+
+    if (allCheckbox) {
+      allCheckbox.checked = selectedCats.size === 0;
+    }
+
+    filterList.querySelectorAll("[data-cat]").forEach(row => {
+      const category = row.dataset.cat;
+      const checkbox = row.querySelector("input");
+
+      checkbox.checked = selectedCats.has(category);
+    });
+  }
+
+  // --------------------------------------------------
+  // FILTER MATCHING
+  // --------------------------------------------------
+
+  function matches(item) {
+    return (
+      selectedCats.size === 0 ||
+      selectedCats.has(item.cat)
+    );
+  }
+
+  // --------------------------------------------------
+  // RENDER PRODUCTS
+  // --------------------------------------------------
+
+  function render() {
+    let list = items.filter(matches);
+
+    // Sort by price
+    list.sort((a, b) => {
+      const priceA = getPrice(a);
+      const priceB = getPrice(b);
+
+      if (priceA !== priceB) {
+        return sortOrder === "asc"
+          ? priceA - priceB
+          : priceB - priceA;
+      }
+
+      return a.id - b.id;
+    });
+
+    grid.innerHTML = "";
 
     if (list.length === 0) {
-      emptyState.style.display = "block";
       grid.style.display = "none";
+      emptyState.style.display = "block";
+
+      emptyText.textContent =
+        "No images in this category yet.";
+
       return;
     }
 
-    emptyState.style.display = "none";
     grid.style.display = "";
-
-    const queue = [];
+    emptyState.style.display = "none";
 
     list.forEach(item => {
       const card = document.createElement("div");
-      card.className = "card card-pending";
+
+      card.className = "card card-loaded";
       card.tabIndex = 0;
       card.setAttribute("role", "button");
-      card.setAttribute("aria-label", "View " + item.title);
+      card.setAttribute(
+        "aria-label",
+        "View " + item.title
+      );
 
+      // IMAGE
       const img = document.createElement("img");
+
+      img.src =
+        BASE_URL +
+        encodeURIComponent(item.file);
+
       img.alt = item.title;
+
+      img.onerror = function () {
+        console.error(
+          "Could not load image:",
+          img.src
+        );
+
+        card.classList.add("card-broken");
+      };
+
       card.appendChild(img);
 
+      // OVERLAY
       const overlay = document.createElement("div");
       overlay.className = "card-overlay";
 
@@ -154,67 +218,59 @@
       tag.className = "card-tag";
       tag.textContent = item.cat;
 
-      bottom.append(title, tag);
+      bottom.appendChild(title);
+      bottom.appendChild(tag);
+
       overlay.appendChild(bottom);
       card.appendChild(overlay);
 
-      card.addEventListener("click", () => openLightbox(item));
-      card.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") {
+      // OPEN LIGHTBOX
+      card.addEventListener("click", function () {
+        openLightbox(item);
+      });
+
+      card.addEventListener("keydown", function (event) {
+        if (
+          event.key === "Enter" ||
+          event.key === " "
+        ) {
           event.preventDefault();
           openLightbox(item);
         }
       });
 
       grid.appendChild(card);
-      queue.push({ item, img, card });
     });
-
-    loadNext(queue, 0, myToken);
   }
 
-  function loadNext(queue, index, myToken) {
-    if (myToken !== loadToken || index >= queue.length) return;
-
-    const { item, img, card } = queue[index];
-
-    const advance = () => loadNext(queue, index + 1, myToken);
-
-    img.addEventListener("load", () => {
-      if (myToken !== loadToken) return;
-      card.classList.remove("card-pending");
-      card.classList.add("card-loaded");
-      advance();
-    }, { once: true });
-
-    img.addEventListener("error", () => {
-      if (myToken !== loadToken) return;
-
-      console.warn("Image failed to load:", item.src);
-      card.classList.remove("card-pending");
-      card.classList.add("card-broken", "card-loaded");
-
-      img.src = "data:image/svg+xml;utf8," + encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300">
-          <rect width="100%" height="100%" fill="#E7E4DB"/>
-          <text x="50%" y="50%" font-family="sans-serif" font-size="14"
-                fill="#5C5A54" text-anchor="middle" dy=".3em">Image unavailable</text>
-        </svg>`
-      );
-
-      advance();
-    }, { once: true });
-
-    img.src = item.src;
-  }
+  // --------------------------------------------------
+  // LIGHTBOX
+  // --------------------------------------------------
 
   function openLightbox(item) {
-    lightboxImg.src = item.src;
+    lightboxImg.src =
+      BASE_URL +
+      encodeURIComponent(item.file);
+
     lightboxImg.alt = item.title;
-    lightboxTitle.textContent = item.title;
-    lightboxPrice.textContent = item.price ? `₱${item.price}` : "Price not set";
-    lightboxDescription.textContent = item.description || "No description yet.";
+
+    lightboxTitle.textContent =
+      item.title || "Untitled";
+
+    if (item.price !== "") {
+      lightboxPrice.textContent =
+        "₱" + item.price;
+    } else {
+      lightboxPrice.textContent =
+        "Price not set";
+    }
+
+    lightboxDescription.textContent =
+      item.description ||
+      "No description yet.";
+
     lightboxOverlay.classList.add("open");
+
     lightboxClose.focus();
   }
 
@@ -223,150 +279,297 @@
     lightboxImg.removeAttribute("src");
   }
 
-  lightboxClose.addEventListener("click", closeLightbox);
+  lightboxClose.addEventListener(
+    "click",
+    closeLightbox
+  );
 
-  lightboxOverlay.addEventListener("click", event => {
-    if (event.target === lightboxOverlay) closeLightbox();
-  });
-
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && lightboxOverlay.classList.contains("open")) {
-      closeLightbox();
-    }
-  });
-
-  resetBtn.addEventListener("click", () => {
-    selectedCats.clear();
-    sortOrder = "asc";
-
-    const asc = sortList.querySelector('input[value="asc"]');
-    if (asc) asc.checked = true;
-
-    syncCheckboxes();
-    render();
-  });
-
-  sortList.querySelectorAll('input[name="sortOrder"]').forEach(radio => {
-    radio.addEventListener("change", () => {
-      if (radio.checked) {
-        sortOrder = radio.value;
-        render();
+  lightboxOverlay.addEventListener(
+    "click",
+    function (event) {
+      if (event.target === lightboxOverlay) {
+        closeLightbox();
       }
-    });
-  });
+    }
+  );
 
-  const hamChrome = document.getElementById("hamburgerChrome");
-  const chromeFlyout = document.getElementById("chromeFlyout");
-  const chromeFlyoutClose = document.getElementById("chromeFlyoutClose");
-  const refreshBtn = document.getElementById("refreshBtn");
+  document.addEventListener(
+    "keydown",
+    function (event) {
+      if (
+        event.key === "Escape" &&
+        lightboxOverlay.classList.contains("open")
+      ) {
+        closeLightbox();
+      }
+    }
+  );
+
+  // --------------------------------------------------
+  // SORT
+  // --------------------------------------------------
+
+  sortList
+    .querySelectorAll(
+      'input[name="sortOrder"]'
+    )
+    .forEach(radio => {
+      radio.addEventListener(
+        "change",
+        function () {
+          if (this.checked) {
+            sortOrder = this.value;
+            render();
+          }
+        }
+      );
+    });
+
+  // --------------------------------------------------
+  // RESET
+  // --------------------------------------------------
+
+  resetBtn.addEventListener(
+    "click",
+    function () {
+      selectedCats.clear();
+
+      sortOrder = "asc";
+
+      const ascending =
+        sortList.querySelector(
+          'input[value="asc"]'
+        );
+
+      if (ascending) {
+        ascending.checked = true;
+      }
+
+      syncFilters();
+      render();
+    }
+  );
+
+  // --------------------------------------------------
+  // HAMBURGER MENU
+  // --------------------------------------------------
+
+  const hamburger =
+    document.getElementById(
+      "hamburgerChrome"
+    );
+
+  const flyout =
+    document.getElementById(
+      "chromeFlyout"
+    );
+
+  const flyoutClose =
+    document.getElementById(
+      "chromeFlyoutClose"
+    );
+
+  const refresh =
+    document.getElementById(
+      "refreshBtn"
+    );
 
   function toggleFlyout() {
-    const isOpen = chromeFlyout.classList.toggle("open");
-    hamChrome.setAttribute("aria-expanded", String(isOpen));
+    const open =
+      flyout.classList.toggle("open");
+
+    hamburger.setAttribute(
+      "aria-expanded",
+      String(open)
+    );
   }
 
   function closeFlyout() {
-    chromeFlyout.classList.remove("open");
-    hamChrome.setAttribute("aria-expanded", "false");
+    flyout.classList.remove("open");
+
+    hamburger.setAttribute(
+      "aria-expanded",
+      "false"
+    );
   }
 
-  hamChrome.addEventListener("click", event => {
-    event.stopPropagation();
-    toggleFlyout();
-  });
-
-  chromeFlyoutClose.addEventListener("click", closeFlyout);
-
-  document.addEventListener("click", event => {
-    if (
-      chromeFlyout.classList.contains("open") &&
-      !chromeFlyout.contains(event.target) &&
-      event.target !== hamChrome
-    ) {
-      closeFlyout();
+  hamburger.addEventListener(
+    "click",
+    function (event) {
+      event.stopPropagation();
+      toggleFlyout();
     }
-  });
+  );
 
-  refreshBtn.addEventListener("click", () => {
-    refreshBtn.classList.add("spin");
-    window.location.reload();
-  });
+  flyoutClose.addEventListener(
+    "click",
+    closeFlyout
+  );
 
-  const flyoutContactsBtn = document.getElementById("flyoutContactsBtn");
-  const contactsOverlay = document.getElementById("contactsOverlay");
-  const contactsClose = document.getElementById("contactsClose");
+  document.addEventListener(
+    "click",
+    function (event) {
+      if (
+        flyout.classList.contains("open") &&
+        !flyout.contains(event.target) &&
+        event.target !== hamburger
+      ) {
+        closeFlyout();
+      }
+    }
+  );
+
+  refresh.addEventListener(
+    "click",
+    function () {
+      window.location.reload();
+    }
+  );
+
+  // --------------------------------------------------
+  // CONTACTS
+  // --------------------------------------------------
+
+  const contactsButton =
+    document.getElementById(
+      "flyoutContactsBtn"
+    );
+
+  const contactsOverlay =
+    document.getElementById(
+      "contactsOverlay"
+    );
+
+  const contactsClose =
+    document.getElementById(
+      "contactsClose"
+    );
 
   function openContacts() {
     closeFlyout();
+
     contactsOverlay.classList.add("open");
+
     contactsClose.focus();
   }
 
   function closeContacts() {
-    contactsOverlay.classList.remove("open");
+    contactsOverlay.classList.remove(
+      "open"
+    );
   }
 
-  flyoutContactsBtn.addEventListener("click", openContacts);
-  contactsClose.addEventListener("click", closeContacts);
+  contactsButton.addEventListener(
+    "click",
+    openContacts
+  );
 
-  contactsOverlay.addEventListener("click", event => {
-    if (event.target === contactsOverlay) closeContacts();
-  });
+  contactsClose.addEventListener(
+    "click",
+    closeContacts
+  );
 
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && contactsOverlay.classList.contains("open")) {
-      closeContacts();
+  contactsOverlay.addEventListener(
+    "click",
+    function (event) {
+      if (
+        event.target === contactsOverlay
+      ) {
+        closeContacts();
+      }
     }
-  });
+  );
 
-  function normalize(rawItems) {
-    if (!Array.isArray(rawItems)) {
-      throw new Error("data.json must contain an array");
-    }
+  // --------------------------------------------------
+  // LOAD JSON
+  // --------------------------------------------------
 
-    items = rawItems
-      .map((item, index) => ({
-        id: index + 1,
-        title: String(item.title || "Untitled"),
-        cat: String(item.cat || "Illustration"),
-        price: item.price ?? "",
-        description: String(item.description || ""),
-        tags: Array.isArray(item.tags) ? item.tags : [],
-        date: item.date || null,
-        file: String(item.file || "").trim()
-      }))
-      .filter(item => item.file)
-      .map(item => ({
-        ...item,
-        src: BASE_URL + encodeURIComponent(item.file)
-      }));
-
-    render();
-  }
-
-  async function loadFromJson() {
-    const response = await fetch(JSON_URL, { cache: "no-store" });
-
-    if (!response.ok) {
-      throw new Error(`Could not load ${JSON_URL} (${response.status})`);
-    }
-
-    return response.json();
-  }
-
-  async function init() {
+  async function loadData() {
     try {
-      const data = await loadFromJson();
-      normalize(data);
+      const response =
+        await fetch(JSON_URL, {
+          cache: "no-store"
+        });
+
+      if (!response.ok) {
+        throw new Error(
+          "data.json returned HTTP " +
+          response.status
+        );
+      }
+
+      const data =
+        await response.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error(
+          "data.json must contain an array"
+        );
+      }
+
+      items = data
+        .map((item, index) => ({
+          id: index + 1,
+
+          file: String(
+            item.file || ""
+          ).trim(),
+
+          title: String(
+            item.title ||
+            "Untitled"
+          ).trim(),
+
+          cat: String(
+            item.cat ||
+            "Uncategorized"
+          ).trim(),
+
+          price:
+            item.price === null ||
+            item.price === undefined
+              ? ""
+              : String(item.price).trim(),
+
+          description: String(
+            item.description || ""
+          ).trim(),
+
+          tags: Array.isArray(
+            item.tags
+          )
+            ? item.tags
+            : []
+        }))
+        .filter(item => item.file);
+
+      // Build categories from JSON
+      buildFilters();
+
+      // Display everything
+      render();
+
+      console.log(
+        "Loaded products:",
+        items
+      );
+
     } catch (error) {
-      console.error("Failed to load portfolio data:", error);
-      emptyState.style.display = "block";
+      console.error(
+        "Failed to load data.json:",
+        error
+      );
+
       grid.style.display = "none";
+      emptyState.style.display = "block";
+
       emptyText.textContent =
-        "Couldn't load the image data right now. Try refreshing the page.";
+        "Couldn't load data.json. Please check that data.json is in the same folder as index.html.";
     }
   }
 
-  buildFilters();
-  init();
+  // START
+  loadData();
+
 })();
+```
